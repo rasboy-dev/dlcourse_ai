@@ -89,8 +89,8 @@ class KNN:
         dists, np array (num_test_samples, num_train_samples) - array
            with distances between each test and each train sample
         '''
-        # num_train = self.train_X.shape[0]
-        # num_test = X.shape[0]
+        num_train = self.train_X.shape[0]
+        num_test = X.shape[0]
         # Using float32 to to save memory - the default is float64
         dists = np.zeros((num_test, num_train), np.float32)
         dists = np.sum(np.abs(X[:,np.newaxis] - self.train_X[np.newaxis,:]),
@@ -137,7 +137,11 @@ class KNN:
         num_test = dists.shape[0]
         pred = np.zeros(num_test, np.int)
         for i in range(num_test):
-            # TODO: Implement choosing best class based on k
-            # nearest training samples
-            pass
+            nearests = np.argpartition(dists[i], self.k)
+            nearests = nearests[0:self.k]
+            nearest_classes = self.train_y[nearests]
+            values, counts = np.unique(self.train_y[nearests], return_counts=True)
+            nearest_class = values[np.random.choice(np.where(counts == np.amax(counts))[0])]
+            pred[i] = nearest_class
+
         return pred
